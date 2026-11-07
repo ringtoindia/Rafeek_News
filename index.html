@@ -1,0 +1,658 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily News | News Portal</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5f7;
+    color: #222;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 22px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #ef4444;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.breaking {
+    background: #dc2626;
+    color: white;
+    padding: 12px 7%;
+    font-weight: bold;
+}
+
+.container {
+    width: 86%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.section-title {
+    margin-bottom: 20px;
+    border-left: 5px solid #dc2626;
+    padding-left: 12px;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+}
+
+.news-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px #00000012;
+}
+
+.news-card img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+}
+
+.news-content {
+    padding: 18px;
+}
+
+.category {
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.news-content h3 {
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.news-content p {
+    color: #666;
+    line-height: 1.5;
+}
+
+.date {
+    color: #999;
+    font-size: 12px;
+    margin-top: 12px;
+}
+
+button {
+    padding: 10px 17px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #dc2626;
+    color: white;
+    margin-top: 12px;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+footer {
+    background: #111827;
+    color: white;
+    text-align: center;
+    padding: 25px;
+    margin-top: 50px;
+}
+
+/* ADMIN */
+
+#adminPage, #loginPage, #articlePage {
+    display: none;
+}
+
+.panel {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.edit-btn {
+    background: #2563eb;
+}
+
+.delete-btn {
+    background: #991b1b;
+}
+
+.back-btn {
+    background: #374151;
+}
+
+.login-box {
+    max-width: 400px;
+    margin: 80px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px #0002;
+}
+
+.article-image {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.article-body {
+    background: white;
+    padding: 25px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+
+@media(max-width:600px) {
+    header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav a {
+        margin: 0 7px;
+    }
+
+    .container {
+        width: 92%;
+    }
+
+    .admin-table {
+        font-size: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">DAILY <span>NEWS</span></div>
+    <nav>
+        <a href="#" onclick="showHome()">Home</a>
+        <a href="#latest">Latest News</a>
+        <a href="#" onclick="showLogin()">Admin</a>
+    </nav>
+</header>
+
+<div class="breaking">
+    BREAKING NEWS | Latest Updates and Headlines
+</div>
+
+<!-- PUBLIC HOMEPAGE -->
+<div id="homePage">
+
+    <div class="container">
+        <h2 class="section-title">Latest News</h2>
+        <div class="news-grid" id="newsGrid"></div>
+    </div>
+
+</div>
+
+<!-- FULL ARTICLE -->
+<div id="articlePage" class="container">
+    <button class="back-btn" onclick="showHome()">← Back to News</button>
+    <div id="articleContent"></div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginPage">
+
+    <div class="login-box">
+        <h2>Admin Login</h2>
+        <p>Login to manage news articles.</p>
+
+        <form onsubmit="login(event)">
+            <label>Username</label>
+            <input type="text" id="username" required>
+
+            <label>Password</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Login</button>
+            <button type="button" class="back-btn"
+                    onclick="showHome()">Back</button>
+        </form>
+
+        <p id="loginError" style="color:red;margin-top:12px"></p>
+    </div>
+
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminPage" class="container">
+
+    <div class="panel">
+        <h2>Admin Dashboard</h2>
+        <p>Manage your published news here.</p>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="panel">
+        <h2 id="formTitle">Publish New News</h2>
+
+        <form onsubmit="saveNews(event)">
+
+            <label>News Title</label>
+            <input type="text" id="newsTitle" required>
+
+            <label>Category</label>
+            <select id="newsCategory">
+                <option>World</option>
+                <option>Local</option>
+                <option>Technology</option>
+                <option>Business</option>
+                <option>Sports</option>
+                <option>Entertainment</option>
+            </select>
+
+            <label>News Image</label>
+            <input type="file" id="newsImage"
+                   accept="image/*">
+
+            <label>Or Image URL</label>
+            <input type="url" id="imageURL"
+                   placeholder="https://example.com/image.jpg">
+
+            <label>News Description</label>
+            <textarea id="newsDescription" required></textarea>
+
+            <button type="submit" id="publishBtn">
+                Publish News
+            </button>
+
+            <button type="button" class="back-btn"
+                    onclick="resetForm()">Clear</button>
+
+        </form>
+    </div>
+
+    <div class="panel">
+        <h2>Published News</h2>
+
+        <div style="overflow-x:auto">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminNewsList"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    © 2026 Daily News. All Rights Reserved.
+</footer>
+
+<script>
+
+// ADMIN LOGIN
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "Admin@123";
+
+let news = JSON.parse(localStorage.getItem("news")) || [];
+let editId = null;
+let selectedImage = "";
+
+// PAGE NAVIGATION
+function hidePages() {
+    ["homePage","loginPage","adminPage","articlePage"]
+    .forEach(id => document.getElementById(id).style.display = "none");
+}
+
+function showHome() {
+    hidePages();
+    document.getElementById("homePage").style.display = "block";
+    renderNews();
+}
+
+function showLogin() {
+    hidePages();
+    document.getElementById("loginPage").style.display = "block";
+}
+
+function showAdmin() {
+    hidePages();
+    document.getElementById("adminPage").style.display = "block";
+    renderAdmin();
+}
+
+// LOGIN
+function login(e) {
+    e.preventDefault();
+
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
+
+    if(user === ADMIN_USER && pass === ADMIN_PASS) {
+        sessionStorage.setItem("adminLoggedIn", "true");
+        document.getElementById("loginError").textContent = "";
+        showAdmin();
+    } else {
+        document.getElementById("loginError").textContent =
+        "Invalid username or password!";
+    }
+}
+
+function logout() {
+    sessionStorage.removeItem("adminLoggedIn");
+    showHome();
+}
+
+// IMAGE UPLOAD
+document.getElementById("newsImage").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+
+    if(file) {
+        if(!file.type.startsWith("image/")) {
+            alert("Please select an image file.");
+            this.value = "";
+            return;
+        }
+
+        if(file.size > 1500000) {
+            alert("Image must be smaller than 1.5 MB.");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function() {
+            selectedImage = reader.result;
+        };
+
+        reader.readAsDataURL(file);
+    }
+});
+
+// SAVE / UPDATE NEWS
+function saveNews(e) {
+    e.preventDefault();
+
+    const title = document.getElementById("newsTitle").value;
+    const category = document.getElementById("newsCategory").value;
+    const description = document.getElementById("newsDescription").value;
+    const url = document.getElementById("imageURL").value;
+
+    let image = selectedImage || url ||
+    "https://placehold.co/600x400?text=Daily+News";
+
+    if(editId !== null) {
+
+        const index = news.findIndex(n => n.id === editId);
+
+        if(index !== -1) {
+            news[index].title = title;
+            news[index].category = category;
+            news[index].description = description;
+            news[index].image = image;
+        }
+
+        alert("News updated successfully!");
+
+    } else {
+
+        news.unshift({
+            id: Date.now(),
+            title: title,
+            category: category,
+            description: description,
+            image: image,
+            date: new Date().toLocaleDateString()
+        });
+
+        alert("News published successfully!");
+    }
+
+    localStorage.setItem("news", JSON.stringify(news));
+
+    resetForm();
+    renderAdmin();
+}
+
+// RESET FORM
+function resetForm() {
+    document.querySelector("#adminPage form").reset();
+    selectedImage = "";
+    editId = null;
+
+    document.getElementById("formTitle").textContent =
+    "Publish New News";
+
+    document.getElementById("publishBtn").textContent =
+    "Publish News";
+}
+
+// DISPLAY NEWS
+function renderNews() {
+
+    const grid = document.getElementById("newsGrid");
+    grid.innerHTML = "";
+
+    news.forEach(item => {
+
+        const card = document.createElement("div");
+        card.className = "news-card";
+
+        const img = document.createElement("img");
+        img.src = item.image;
+        img.alt = item.title;
+
+        const content = document.createElement("div");
+        content.className = "news-content";
+
+        const category = document.createElement("div");
+        category.className = "category";
+        category.textContent = item.category;
+
+        const title = document.createElement("h3");
+        title.textContent = item.title;
+
+        const desc = document.createElement("p");
+        desc.textContent = item.description.substring(0,120) + "...";
+
+        const date = document.createElement("div");
+        date.className = "date";
+        date.textContent = item.date || "";
+
+        const btn = document.createElement("button");
+        btn.textContent = "Read More";
+        btn.onclick = () => readArticle(item.id);
+
+        content.append(category,title,desc,date,btn);
+        card.append(img,content);
+        grid.appendChild(card);
+    });
+
+    if(news.length === 0) {
+        grid.textContent = "No news published yet.";
+    }
+}
+
+// READ ARTICLE
+function readArticle(id) {
+
+    const item = news.find(n => n.id === id);
+    if(!item) return;
+
+    hidePages();
+    document.getElementById("articlePage").style.display = "block";
+
+    const area = document.getElementById("articleContent");
+    area.innerHTML = "";
+
+    const heading = document.createElement("h1");
+    heading.textContent = item.title;
+
+    const category = document.createElement("p");
+    category.textContent = item.category + " | " + (item.date || "");
+
+    const image = document.createElement("img");
+    image.src = item.image;
+    image.className = "article-image";
+
+    const description = document.createElement("div");
+    description.className = "article-body";
+    description.textContent = item.description;
+
+    area.append(heading,category,image,description);
+}
+
+// ADMIN NEWS LIST
+function renderAdmin() {
+
+    const list = document.getElementById("adminNewsList");
+    list.innerHTML = "";
+
+    news.forEach(item => {
+
+        const tr = document.createElement("tr");
+
+        const title = document.createElement("td");
+        title.textContent = item.title;
+
+        const category = document.createElement("td");
+        category.textContent = item.category;
+
+        const actions = document.createElement("td");
+
+        const edit = document.createElement("button");
+        edit.className = "edit-btn";
+        edit.textContent = "Edit";
+        edit.onclick = () => editNews(item.id);
+
+        const del = document.createElement("button");
+        del.className = "delete-btn";
+        del.textContent = "Delete";
+        del.onclick = () => deleteNews(item.id);
+
+        actions.append(edit,del);
+        tr.append(title,category,actions);
+        list.appendChild(tr);
+    });
+
+    if(news.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 3;
+        td.textContent = "No published news.";
+        tr.appendChild(td);
+        list.appendChild(tr);
+    }
+}
+
+// EDIT NEWS
+function editNews(id) {
+
+    const item = news.find(n => n.id === id);
+    if(!item) return;
+
+    editId = id;
+
+    document.getElementById("newsTitle").value = item.title;
+    document.getElementById("newsCategory").value = item.category;
+    document.getElementById("newsDescription").value = item.description;
+
+    selectedImage = item.image.startsWith("data:image/")
+        ? item.image : "";
+
+    document.getElementById("imageURL").value =
+        item.image.startsWith("data:image/") ? "" : item.image;
+
+    document.getElementById("formTitle").textContent = "Update News";
+    document.getElementById("publishBtn").textContent = "Update News";
+
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// DELETE NEWS
+function deleteNews(id) {
+
+    if(confirm("Are you sure you want to delete this news?")) {
+
+        news = news.filter(n => n.id !== id);
+
+        localStorage.setItem("news", JSON.stringify(news));
+
+        renderAdmin();
+        renderNews();
+    }
+}
+
+// INITIAL PAGE
+if(sessionStorage.getItem("adminLoggedIn") === "true") {
+    showAdmin();
+} else {
+    showHome();
+}
+
+</script>
+
+</body>
+</html>
