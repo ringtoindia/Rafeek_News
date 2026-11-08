@@ -27,6 +27,10 @@
     nav { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
     nav a { color: var(--gold); text-decoration: none; font-size: 14px; letter-spacing: .5px; }
     nav a:hover { color: var(--gold-light); }
+    .catbar { background: #07070b; border-bottom: 1px solid var(--gold-soft); padding: 0 max(5%, calc((100% - 1200px)/2)); display: flex; gap: 4px; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; scrollbar-color: var(--gold-soft) transparent; position: sticky; top: 0; z-index: 20; }
+    .catbar a { color: var(--gold); text-decoration: none; font-size: 13px; letter-spacing: .6px; padding: 14px 14px; border-bottom: 3px solid transparent; flex: 0 0 auto; }
+    .catbar a:hover { color: var(--gold-light); background: #14141c; }
+    .catbar a.active { color: var(--gold-light); border-bottom-color: var(--gold); font-weight: 700; }
     .breaking { background: linear-gradient(90deg, #3b0a0a, #7f1d1d, #3b0a0a); color: var(--gold-light); padding: 11px max(5%, calc((100% - 1200px)/2)); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--gold-soft); }
     .container { width: min(90%, 1200px); margin: 30px auto; min-height: 48vh; }
     .section-title { margin: 0 0 20px; border-left: 5px solid var(--gold); padding-left: 12px; font-size: 25px; }
@@ -87,11 +91,12 @@
       <a href="#" id="adminLink">Admin</a>
     </nav>
   </header>
+  <div class="catbar" id="catBar" aria-label="News categories"></div>
   <div class="breaking">BREAKING NEWS <span style="font-weight:400">| Latest Updates and Headlines</span></div>
 
   <main>
     <section id="homePage" class="container">
-      <h2 class="section-title" id="latest">Latest News</h2>
+      <h2 class="section-title" id="latest"><span id="sectionTitle">Latest News</span></h2>
       <div id="homeMessage" class="notice hidden"></div>
       <div class="news-grid" id="newsGrid"></div>
     </section>
@@ -184,6 +189,25 @@
     let news = [];
     let editId = null;
     let currentImageUrl = "";
+    let currentCategory = "All";
+    const CATEGORIES = ["Advertisements", "Information", "Crime", "Local", "Education", "Science and Technology", "Sports", "Weather", "Life style", "Others"];
+
+    function normalizeCategory(value) {
+      return CATEGORIES.includes(value) ? value : "Others";
+    }
+
+    function renderCatBar() {
+      const bar = $("catBar");
+      bar.replaceChildren();
+      ["All", ...CATEGORIES].forEach(name => {
+        const a = document.createElement("a");
+        a.href = "#";
+        a.textContent = name === "All" ? "All News" : name;
+        if (name === currentCategory) a.classList.add("active");
+        a.addEventListener("click", event => { event.preventDefault(); showHome(name); });
+        bar.appendChild(a);
+      });
+    }
 
     const $ = (id) => document.getElementById(id);
     $("year").textContent = new Date().getFullYear();
@@ -235,7 +259,9 @@
       return true;
     }
 
-    async function showHome() {
+    async function showHome(category = "All") {
+      currentCategory = category;
+      renderCatBar();
       showOnly("homePage");
       await loadNews();
     }
@@ -244,15 +270,22 @@
       const grid = $("newsGrid");
       grid.replaceChildren();
 
-      if (!news.length) {
+      $("sectionTitle").textContent = currentCategory === "All" ? "Latest News" : currentCategory;
+      const visible = currentCategory === "All"
+        ? news
+        : news.filter(item => normalizeCategory(item.category) === currentCategory);
+
+      if (!visible.length) {
         const empty = document.createElement("p");
         empty.className = "muted";
-        empty.textContent = "No news published yet. Please check back soon.";
+        empty.textContent = currentCategory === "All"
+          ? "No news published yet. Please check back soon."
+          : "No news in " + currentCategory + " yet. Please check back soon.";
         grid.appendChild(empty);
         return;
       }
 
-      news.forEach(item => {
+      visible.forEach(item => {
         const card = document.createElement("article");
         card.className = "news-card";
         card.appendChild(makeImage(item.image, item.title));
@@ -510,11 +543,11 @@
       renderAdmin();
     }
 
-    $("homeLink").addEventListener("click", event => { event.preventDefault(); showHome(); });
-    $("latestLink").addEventListener("click", event => { event.preventDefault(); showHome(); });
+    $("homeLink").addEventListener("click", event => { event.preventDefault(); showHome("All"); });
+    $("latestLink").addEventListener("click", event => { event.preventDefault(); showHome("All"); });
     $("adminLink").addEventListener("click", event => { event.preventDefault(); showLogin(); });
-    $("backToNews").addEventListener("click", showHome);
-    $("loginBack").addEventListener("click", showHome);
+    $("backToNews").addEventListener("click", () => showHome(currentCategory));
+    $("loginBack").addEventListener("click", () => showHome(currentCategory));
     $("loginForm").addEventListener("submit", handleLogin);
     $("newsForm").addEventListener("submit", saveNews);
     $("logoutButton").addEventListener("click", handleLogout);
