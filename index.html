@@ -1,658 +1,516 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily News | News Portal</title>
-
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-body {
-    background: #f4f5f7;
-    color: #222;
-}
-
-header {
-    background: #111827;
-    color: white;
-    padding: 22px 7%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 27px;
-    font-weight: bold;
-}
-
-.logo span {
-    color: #ef4444;
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    margin-left: 20px;
-}
-
-.breaking {
-    background: #dc2626;
-    color: white;
-    padding: 12px 7%;
-    font-weight: bold;
-}
-
-.container {
-    width: 86%;
-    max-width: 1200px;
-    margin: 30px auto;
-}
-
-.section-title {
-    margin-bottom: 20px;
-    border-left: 5px solid #dc2626;
-    padding-left: 12px;
-}
-
-.news-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 22px;
-}
-
-.news-card {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 3px 12px #00000012;
-}
-
-.news-card img {
-    width: 100%;
-    height: 190px;
-    object-fit: cover;
-}
-
-.news-content {
-    padding: 18px;
-}
-
-.category {
-    color: #dc2626;
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.news-content h3 {
-    margin: 10px 0;
-    line-height: 1.4;
-}
-
-.news-content p {
-    color: #666;
-    line-height: 1.5;
-}
-
-.date {
-    color: #999;
-    font-size: 12px;
-    margin-top: 12px;
-}
-
-button {
-    padding: 10px 17px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background: #dc2626;
-    color: white;
-    margin-top: 12px;
-}
-
-button:hover {
-    opacity: .85;
-}
-
-footer {
-    background: #111827;
-    color: white;
-    text-align: center;
-    padding: 25px;
-    margin-top: 50px;
-}
-
-/* ADMIN */
-
-#adminPage, #loginPage, #articlePage {
-    display: none;
-}
-
-.panel {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-}
-
-input, textarea, select {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-textarea {
-    min-height: 140px;
-    resize: vertical;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.admin-table th, .admin-table td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-}
-
-.edit-btn {
-    background: #2563eb;
-}
-
-.delete-btn {
-    background: #991b1b;
-}
-
-.back-btn {
-    background: #374151;
-}
-
-.login-box {
-    max-width: 400px;
-    margin: 80px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px #0002;
-}
-
-.article-image {
-    width: 100%;
-    max-height: 450px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin: 20px 0;
-}
-
-.article-body {
-    background: white;
-    padding: 25px;
-    line-height: 1.8;
-    white-space: pre-wrap;
-}
-
-@media(max-width:600px) {
-    header {
-        flex-direction: column;
-        gap: 15px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Daily News - latest headlines and updates">
+  <title>Daily News | News Portal</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --red: #dc2626;
+      --navy: #111827;
+      --paper: #f4f6f9;
+      --line: #e5e7eb;
     }
-
-    nav a {
-        margin: 0 7px;
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: #222; font-family: Arial, Helvetica, sans-serif; }
+    header { background: var(--navy); color: white; padding: 20px max(5%, calc((100% - 1200px)/2)); display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .logo { font-size: 27px; font-weight: 800; letter-spacing: .5px; }
+    .logo span { color: #ef4444; }
+    nav { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+    nav a { color: white; text-decoration: none; font-size: 14px; }
+    nav a:hover { color: #fca5a5; }
+    .breaking { background: var(--red); color: white; padding: 11px max(5%, calc((100% - 1200px)/2)); font-size: 13px; font-weight: 700; }
+    .container { width: min(90%, 1200px); margin: 30px auto; min-height: 48vh; }
+    .section-title { margin: 0 0 20px; border-left: 5px solid var(--red); padding-left: 12px; font-size: 25px; }
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+    .news-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 14px #10182812; display: flex; flex-direction: column; }
+    .news-card img { width: 100%; height: 195px; object-fit: cover; background: #e5e7eb; }
+    .news-content { padding: 18px; display: flex; flex-direction: column; flex: 1; }
+    .category { color: var(--red); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
+    .news-content h3 { margin: 9px 0; line-height: 1.4; font-size: 19px; }
+    .news-content p { color: var(--muted); line-height: 1.55; margin: 0; }
+    .date { color: #98a2b3; font-size: 12px; margin-top: 13px; }
+    button { border: 0; border-radius: 6px; cursor: pointer; background: var(--red); color: white; padding: 10px 16px; font-weight: 700; }
+    button:hover { filter: brightness(.94); }
+    button:disabled { opacity: .55; cursor: wait; }
+    .read-button { align-self: flex-start; margin-top: 14px; }
+    footer { background: var(--navy); color: white; text-align: center; padding: 24px; margin-top: 50px; font-size: 14px; }
+    .hidden { display: none !important; }
+    .panel { background: white; padding: 24px; border-radius: 10px; margin-bottom: 22px; box-shadow: 0 3px 14px #1018280c; }
+    .panel h2 { margin-top: 0; }
+    .login-box { max-width: 420px; margin: 65px auto; }
+    input, textarea, select { width: 100%; padding: 12px; margin: 7px 0 16px; border: 1px solid #d0d5dd; border-radius: 6px; font: inherit; background: white; }
+    textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+    label { font-size: 14px; font-weight: 700; }
+    .secondary { background: #475467; }
+    .edit-btn { background: #2563eb; margin-right: 6px; }
+    .delete-btn { background: #991b1b; }
+    .admin-table-wrap { overflow-x: auto; }
+    .admin-table { width: 100%; border-collapse: collapse; min-width: 550px; }
+    .admin-table th, .admin-table td { padding: 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    .admin-table th { background: #f9fafb; font-size: 13px; }
+    .article-image { width: 100%; max-height: 470px; object-fit: cover; border-radius: 9px; margin: 20px 0; background: #e5e7eb; }
+    .article-body { background: white; padding: 26px; border-radius: 9px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .article-meta { color: var(--muted); margin-top: 8px; font-size: 14px; }
+    .notice { padding: 12px 14px; border-radius: 7px; margin: 12px 0; background: #eff6ff; color: #1d4ed8; font-size: 14px; }
+    .error { background: #fef2f2; color: #b91c1c; }
+    .success { background: #ecfdf3; color: #027a48; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .muted { color: var(--muted); font-size: 13px; }
+    @media (max-width: 620px) {
+      header { flex-direction: column; align-items: flex-start; padding: 18px 5%; }
+      nav { gap: 14px; }
+      .container { width: 92%; margin: 22px auto; }
+      .panel { padding: 17px; }
+      .section-title { font-size: 22px; }
     }
-
-    .container {
-        width: 92%;
-    }
-
-    .admin-table {
-        font-size: 12px;
-    }
-}
-</style>
+  </style>
 </head>
-
 <body>
-
-<header>
+  <header>
     <div class="logo">DAILY <span>NEWS</span></div>
     <nav>
-        <a href="#" onclick="showHome()">Home</a>
-        <a href="#latest">Latest News</a>
-        <a href="#" onclick="showLogin()">Admin</a>
+      <a href="#" id="homeLink">Home</a>
+      <a href="#latest" id="latestLink">Latest News</a>
+      <a href="#" id="adminLink">Admin</a>
     </nav>
-</header>
+  </header>
+  <div class="breaking">BREAKING NEWS <span style="font-weight:400">| Latest Updates and Headlines</span></div>
 
-<div class="breaking">
-    BREAKING NEWS | Latest Updates and Headlines
-</div>
+  <main>
+    <section id="homePage" class="container">
+      <h2 class="section-title" id="latest">Latest News</h2>
+      <div id="homeMessage" class="notice hidden"></div>
+      <div class="news-grid" id="newsGrid"></div>
+    </section>
 
-<!-- PUBLIC HOMEPAGE -->
-<div id="homePage">
+    <section id="articlePage" class="container hidden">
+      <button class="secondary" id="backToNews">← Back to News</button>
+      <article id="articleContent" style="margin-top:22px"></article>
+    </section>
 
-    <div class="container">
-        <h2 class="section-title">Latest News</h2>
-        <div class="news-grid" id="newsGrid"></div>
-    </div>
-
-</div>
-
-<!-- FULL ARTICLE -->
-<div id="articlePage" class="container">
-    <button class="back-btn" onclick="showHome()">← Back to News</button>
-    <div id="articleContent"></div>
-</div>
-
-<!-- LOGIN -->
-<div id="loginPage">
-
-    <div class="login-box">
+    <section id="loginPage" class="container hidden">
+      <div class="panel login-box">
         <h2>Admin Login</h2>
-        <p>Login to manage news articles.</p>
-
-        <form onsubmit="login(event)">
-            <label>Username</label>
-            <input type="text" id="username" required>
-
-            <label>Password</label>
-            <input type="password" id="password" required>
-
-            <button type="submit">Login</button>
-            <button type="button" class="back-btn"
-                    onclick="showHome()">Back</button>
+        <p class="muted">Sign in with the administrator account created in Supabase.</p>
+        <form id="loginForm">
+          <label for="username">Admin email</label>
+          <input type="email" id="username" autocomplete="username" required>
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" required>
+          <button type="submit" id="loginButton">Login</button>
+          <button type="button" class="secondary" id="loginBack">Back</button>
         </form>
+        <div id="loginMessage" class="notice hidden" role="alert"></div>
+      </div>
+    </section>
 
-        <p id="loginError" style="color:red;margin-top:12px"></p>
-    </div>
-
-</div>
-
-<!-- ADMIN DASHBOARD -->
-<div id="adminPage" class="container">
-
-    <div class="panel">
-        <h2>Admin Dashboard</h2>
-        <p>Manage your published news here.</p>
-        <button onclick="logout()">Logout</button>
-    </div>
-
-    <div class="panel">
-        <h2 id="formTitle">Publish New News</h2>
-
-        <form onsubmit="saveNews(event)">
-
-            <label>News Title</label>
-            <input type="text" id="newsTitle" required>
-
-            <label>Category</label>
-            <select id="newsCategory">
-                <option>World</option>
-                <option>Local</option>
-                <option>Technology</option>
-                <option>Business</option>
-                <option>Sports</option>
-                <option>Entertainment</option>
-            </select>
-
-            <label>News Image</label>
-            <input type="file" id="newsImage"
-                   accept="image/*">
-
-            <label>Or Image URL</label>
-            <input type="url" id="imageURL"
-                   placeholder="https://example.com/image.jpg">
-
-            <label>News Description</label>
-            <textarea id="newsDescription" required></textarea>
-
-            <button type="submit" id="publishBtn">
-                Publish News
-            </button>
-
-            <button type="button" class="back-btn"
-                    onclick="resetForm()">Clear</button>
-
-        </form>
-    </div>
-
-    <div class="panel">
-        <h2>Published News</h2>
-
-        <div style="overflow-x:auto">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="adminNewsList"></tbody>
-            </table>
+    <section id="adminPage" class="container hidden">
+      <div class="panel toolbar">
+        <div>
+          <h2 style="margin:0 0 5px">Admin Dashboard</h2>
+          <span class="muted" id="adminEmail"></span>
         </div>
-    </div>
+        <button id="logoutButton" class="secondary">Logout</button>
+      </div>
 
-</div>
+      <div class="panel">
+        <h2 id="formTitle">Publish New News</h2>
+        <form id="newsForm">
+          <label for="newsTitle">News title</label>
+          <input type="text" id="newsTitle" maxlength="180" required>
+          <label for="newsCategory">Category</label>
+          <select id="newsCategory">
+            <option>World</option><option>Local</option><option>Technology</option>
+            <option>Business</option><option>Sports</option><option>Entertainment</option>
+          </select>
+          <label for="newsImage">Upload news image (optional)</label>
+          <input type="file" id="newsImage" accept="image/png,image/jpeg,image/webp">
+          <p class="muted">Images are uploaded to your Supabase Storage bucket named <b>news-images</b>. Maximum file size: 5 MB.</p>
+          <label for="imageURL">Or use an image URL</label>
+          <input type="url" id="imageURL" placeholder="https://example.com/image.jpg">
+          <label for="newsDescription">News description / full article</label>
+          <textarea id="newsDescription" required></textarea>
+          <button type="submit" id="publishButton">Publish News</button>
+          <button type="button" class="secondary" id="clearButton">Clear</button>
+          <div id="adminMessage" class="notice hidden" role="status"></div>
+        </form>
+      </div>
 
-<footer>
-    © 2026 Daily News. All Rights Reserved.
-</footer>
+      <div class="panel">
+        <h2>Published News</h2>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="adminNewsList"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
 
-<script>
+  <footer>© <span id="year"></span> Daily News. All Rights Reserved.</footer>
 
-// ADMIN LOGIN
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "Admin@123";
+  <!-- Supabase JavaScript client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Supabase Project URL must be the project root, NOT the /rest/v1/ endpoint.
+    const SUPABASE_URL = "https://rgnvlniiuhbzjegzoqcs.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GFiY7Hz9BOe16z0VwUFd0w_MiCF596M";
+    const STORAGE_BUCKET = "news-images";
 
-let news = JSON.parse(localStorage.getItem("news")) || [];
-let editId = null;
-let selectedImage = "";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-// PAGE NAVIGATION
-function hidePages() {
-    ["homePage","loginPage","adminPage","articlePage"]
-    .forEach(id => document.getElementById(id).style.display = "none");
-}
+    let news = [];
+    let editId = null;
+    let currentImageUrl = "";
 
-function showHome() {
-    hidePages();
-    document.getElementById("homePage").style.display = "block";
-    renderNews();
-}
+    const $ = (id) => document.getElementById(id);
+    $("year").textContent = new Date().getFullYear();
 
-function showLogin() {
-    hidePages();
-    document.getElementById("loginPage").style.display = "block";
-}
-
-function showAdmin() {
-    hidePages();
-    document.getElementById("adminPage").style.display = "block";
-    renderAdmin();
-}
-
-// LOGIN
-function login(e) {
-    e.preventDefault();
-
-    let user = document.getElementById("username").value;
-    let pass = document.getElementById("password").value;
-
-    if(user === ADMIN_USER && pass === ADMIN_PASS) {
-        sessionStorage.setItem("adminLoggedIn", "true");
-        document.getElementById("loginError").textContent = "";
-        showAdmin();
-    } else {
-        document.getElementById("loginError").textContent =
-        "Invalid username or password!";
-    }
-}
-
-function logout() {
-    sessionStorage.removeItem("adminLoggedIn");
-    showHome();
-}
-
-// IMAGE UPLOAD
-document.getElementById("newsImage").addEventListener("change", function(e) {
-    const file = e.target.files[0];
-
-    if(file) {
-        if(!file.type.startsWith("image/")) {
-            alert("Please select an image file.");
-            this.value = "";
-            return;
-        }
-
-        if(file.size > 1500000) {
-            alert("Image must be smaller than 1.5 MB.");
-            this.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = function() {
-            selectedImage = reader.result;
-        };
-
-        reader.readAsDataURL(file);
-    }
-});
-
-// SAVE / UPDATE NEWS
-function saveNews(e) {
-    e.preventDefault();
-
-    const title = document.getElementById("newsTitle").value;
-    const category = document.getElementById("newsCategory").value;
-    const description = document.getElementById("newsDescription").value;
-    const url = document.getElementById("imageURL").value;
-
-    let image = selectedImage || url ||
-    "https://placehold.co/600x400?text=Daily+News";
-
-    if(editId !== null) {
-
-        const index = news.findIndex(n => n.id === editId);
-
-        if(index !== -1) {
-            news[index].title = title;
-            news[index].category = category;
-            news[index].description = description;
-            news[index].image = image;
-        }
-
-        alert("News updated successfully!");
-
-    } else {
-
-        news.unshift({
-            id: Date.now(),
-            title: title,
-            category: category,
-            description: description,
-            image: image,
-            date: new Date().toLocaleDateString()
-        });
-
-        alert("News published successfully!");
+    function showOnly(pageId) {
+      ["homePage", "loginPage", "adminPage", "articlePage"].forEach(id => $(id).classList.add("hidden"));
+      $(pageId).classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    localStorage.setItem("news", JSON.stringify(news));
+    function showNotice(id, message, type = "info") {
+      const el = $(id);
+      el.textContent = message;
+      el.className = "notice" + (type === "error" ? " error" : type === "success" ? " success" : "");
+      el.classList.remove("hidden");
+    }
 
-    resetForm();
-    renderAdmin();
-}
+    function hideNotice(id) { $(id).classList.add("hidden"); }
 
-// RESET FORM
-function resetForm() {
-    document.querySelector("#adminPage form").reset();
-    selectedImage = "";
-    editId = null;
+    function formatDate(value) {
+      if (!value) return "";
+      return new Date(value).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
 
-    document.getElementById("formTitle").textContent =
-    "Publish New News";
+    function makeImage(src, alt, className) {
+      const img = document.createElement("img");
+      img.src = src || "https://placehold.co/800x450?text=Daily+News";
+      img.alt = alt || "News image";
+      img.className = className || "";
+      img.loading = "lazy";
+      img.onerror = () => { img.onerror = null; img.src = "https://placehold.co/800x450?text=Daily+News"; };
+      return img;
+    }
 
-    document.getElementById("publishBtn").textContent =
-    "Publish News";
-}
+    async function loadNews() {
+      const { data, error } = await db.from("news")
+        .select("id,title,category,description,image,created_at")
+        .order("created_at", { ascending: false });
 
-// DISPLAY NEWS
-function renderNews() {
+      if (error) {
+        console.error("Could not load news:", error);
+        showNotice("homeMessage", "Could not load news. Check your Supabase table and public read policy. " + error.message, "error");
+        return false;
+      }
 
-    const grid = document.getElementById("newsGrid");
-    grid.innerHTML = "";
+      news = data || [];
+      hideNotice("homeMessage");
+      renderNews();
+      return true;
+    }
 
-    news.forEach(item => {
+    async function showHome() {
+      showOnly("homePage");
+      await loadNews();
+    }
 
-        const card = document.createElement("div");
+    function renderNews() {
+      const grid = $("newsGrid");
+      grid.replaceChildren();
+
+      if (!news.length) {
+        const empty = document.createElement("p");
+        empty.className = "muted";
+        empty.textContent = "No news published yet. Please check back soon.";
+        grid.appendChild(empty);
+        return;
+      }
+
+      news.forEach(item => {
+        const card = document.createElement("article");
         card.className = "news-card";
-
-        const img = document.createElement("img");
-        img.src = item.image;
-        img.alt = item.title;
+        card.appendChild(makeImage(item.image, item.title));
 
         const content = document.createElement("div");
         content.className = "news-content";
 
         const category = document.createElement("div");
         category.className = "category";
-        category.textContent = item.category;
+        category.textContent = item.category || "News";
 
         const title = document.createElement("h3");
         title.textContent = item.title;
 
-        const desc = document.createElement("p");
-        desc.textContent = item.description.substring(0,120) + "...";
+        const summary = document.createElement("p");
+        summary.textContent = (item.description || "").length > 135
+          ? item.description.slice(0, 135) + "…" : (item.description || "");
 
         const date = document.createElement("div");
         date.className = "date";
-        date.textContent = item.date || "";
+        date.textContent = formatDate(item.created_at);
 
-        const btn = document.createElement("button");
-        btn.textContent = "Read More";
-        btn.onclick = () => readArticle(item.id);
+        const button = document.createElement("button");
+        button.className = "read-button";
+        button.textContent = "Read More";
+        button.addEventListener("click", () => readArticle(item.id));
 
-        content.append(category,title,desc,date,btn);
-        card.append(img,content);
+        content.append(category, title, summary, date, button);
+        card.appendChild(content);
         grid.appendChild(card);
-    });
-
-    if(news.length === 0) {
-        grid.textContent = "No news published yet.";
+      });
     }
-}
 
-// READ ARTICLE
-function readArticle(id) {
+    function readArticle(id) {
+      const item = news.find(row => String(row.id) === String(id));
+      if (!item) return;
 
-    const item = news.find(n => n.id === id);
-    if(!item) return;
+      showOnly("articlePage");
+      const area = $("articleContent");
+      area.replaceChildren();
 
-    hidePages();
-    document.getElementById("articlePage").style.display = "block";
+      const title = document.createElement("h1");
+      title.textContent = item.title;
 
-    const area = document.getElementById("articleContent");
-    area.innerHTML = "";
+      const meta = document.createElement("div");
+      meta.className = "article-meta";
+      meta.textContent = (item.category || "News") + " · " + formatDate(item.created_at);
 
-    const heading = document.createElement("h1");
-    heading.textContent = item.title;
+      const image = makeImage(item.image, item.title, "article-image");
+      const body = document.createElement("div");
+      body.className = "article-body";
+      body.textContent = item.description || "";
 
-    const category = document.createElement("p");
-    category.textContent = item.category + " | " + (item.date || "");
+      area.append(title, meta, image, body);
+    }
 
-    const image = document.createElement("img");
-    image.src = item.image;
-    image.className = "article-image";
+    async function showLogin() {
+      showOnly("loginPage");
+      hideNotice("loginMessage");
+    }
 
-    const description = document.createElement("div");
-    description.className = "article-body";
-    description.textContent = item.description;
+    async function showAdmin() {
+      const { data: { session }, error } = await db.auth.getSession();
+      if (error || !session) {
+        showLogin();
+        return;
+      }
+      showOnly("adminPage");
+      $("adminEmail").textContent = session.user.email || "";
+      await loadNews();
+      renderAdmin();
+    }
 
-    area.append(heading,category,image,description);
-}
+    async function handleLogin(event) {
+      event.preventDefault();
+      hideNotice("loginMessage");
+      $("loginButton").disabled = true;
+      $("loginButton").textContent = "Signing in…";
 
-// ADMIN NEWS LIST
-function renderAdmin() {
+      const email = $("username").value.trim();
+      const password = $("password").value;
+      const { error } = await db.auth.signInWithPassword({ email, password });
 
-    const list = document.getElementById("adminNewsList");
-    list.innerHTML = "";
+      $("loginButton").disabled = false;
+      $("loginButton").textContent = "Login";
 
-    news.forEach(item => {
+      if (error) {
+        showNotice("loginMessage", error.message, "error");
+        return;
+      }
+      $("loginForm").reset();
+      await showAdmin();
+    }
 
-        const tr = document.createElement("tr");
+    async function handleLogout() {
+      const { error } = await db.auth.signOut();
+      if (error) {
+        alert("Logout failed: " + error.message);
+        return;
+      }
+      resetForm();
+      await showHome();
+    }
 
+    async function uploadImage(file) {
+      if (!file) return currentImageUrl;
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        throw new Error("Please choose a JPG, PNG or WEBP image.");
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("Image must be 5 MB or smaller.");
+      }
+
+      const extension = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = Date.now() + "-" + crypto.randomUUID() + "." + extension;
+      const { error } = await db.storage.from(STORAGE_BUCKET).upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type
+      });
+      if (error) throw error;
+
+      const { data } = db.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function saveNews(event) {
+      event.preventDefault();
+      hideNotice("adminMessage");
+
+      const title = $("newsTitle").value.trim();
+      const category = $("newsCategory").value;
+      const description = $("newsDescription").value.trim();
+      const imageFile = $("newsImage").files[0];
+      const imageURL = $("imageURL").value.trim();
+
+      if (!title || !description) {
+        showNotice("adminMessage", "Please enter a title and article description.", "error");
+        return;
+      }
+
+      $("publishButton").disabled = true;
+      $("publishButton").textContent = editId === null ? "Publishing…" : "Updating…";
+
+      try {
+        let image = currentImageUrl;
+        if (imageFile) {
+          image = await uploadImage(imageFile);
+        } else if (imageURL) {
+          image = imageURL;
+        }
+
+        const payload = { title, category, description, image: image || null };
+        let result;
+
+        if (editId !== null) {
+          result = await db.from("news").update(payload).eq("id", editId);
+        } else {
+          result = await db.from("news").insert(payload);
+        }
+
+        if (result.error) throw result.error;
+
+        showNotice("adminMessage", editId === null ? "News published successfully." : "News updated successfully.", "success");
+        resetForm(false);
+        await loadNews();
+        renderAdmin();
+      } catch (error) {
+        console.error(error);
+        showNotice("adminMessage", "Could not save news: " + (error.message || "Unknown error"), "error");
+      } finally {
+        $("publishButton").disabled = false;
+        $("publishButton").textContent = editId === null ? "Publish News" : "Update News";
+      }
+    }
+
+    function resetForm(clearMessage = true) {
+      $("newsForm").reset();
+      editId = null;
+      currentImageUrl = "";
+      $("formTitle").textContent = "Publish New News";
+      $("publishButton").textContent = "Publish News";
+      if (clearMessage) hideNotice("adminMessage");
+    }
+
+    function renderAdmin() {
+      const tbody = $("adminNewsList");
+      tbody.replaceChildren();
+
+      if (!news.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.textContent = "No published news.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+      }
+
+      news.forEach(item => {
+        const row = document.createElement("tr");
         const title = document.createElement("td");
         title.textContent = item.title;
-
         const category = document.createElement("td");
-        category.textContent = item.category;
-
+        category.textContent = item.category || "";
+        const date = document.createElement("td");
+        date.textContent = formatDate(item.created_at);
         const actions = document.createElement("td");
 
         const edit = document.createElement("button");
         edit.className = "edit-btn";
         edit.textContent = "Edit";
-        edit.onclick = () => editNews(item.id);
+        edit.addEventListener("click", () => editNews(item.id));
 
         const del = document.createElement("button");
         del.className = "delete-btn";
         del.textContent = "Delete";
-        del.onclick = () => deleteNews(item.id);
+        del.addEventListener("click", () => deleteNews(item.id));
 
-        actions.append(edit,del);
-        tr.append(title,category,actions);
-        list.appendChild(tr);
+        actions.append(edit, del);
+        row.append(title, category, date, actions);
+        tbody.appendChild(row);
+      });
+    }
+
+    function editNews(id) {
+      const item = news.find(row => String(row.id) === String(id));
+      if (!item) return;
+
+      editId = item.id;
+      currentImageUrl = item.image || "";
+      $("newsTitle").value = item.title || "";
+      $("newsCategory").value = item.category || "World";
+      $("newsDescription").value = item.description || "";
+      $("imageURL").value = item.image || "";
+      $("newsImage").value = "";
+      $("formTitle").textContent = "Update News";
+      $("publishButton").textContent = "Update News";
+      hideNotice("adminMessage");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteNews(id) {
+      if (!confirm("Are you sure you want to delete this news article?")) return;
+
+      const { error } = await db.from("news").delete().eq("id", id);
+      if (error) {
+        alert("Could not delete news: " + error.message);
+        return;
+      }
+      await loadNews();
+      renderAdmin();
+    }
+
+    $("homeLink").addEventListener("click", event => { event.preventDefault(); showHome(); });
+    $("latestLink").addEventListener("click", event => { event.preventDefault(); showHome(); });
+    $("adminLink").addEventListener("click", event => { event.preventDefault(); showLogin(); });
+    $("backToNews").addEventListener("click", showHome);
+    $("loginBack").addEventListener("click", showHome);
+    $("loginForm").addEventListener("submit", handleLogin);
+    $("newsForm").addEventListener("submit", saveNews);
+    $("logoutButton").addEventListener("click", handleLogout);
+    $("clearButton").addEventListener("click", () => resetForm());
+
+    // Restore the correct page after a refresh, and respond to auth changes.
+    db.auth.onAuthStateChange((_event, session) => {
+      if (!session && !$("loginPage").classList.contains("hidden")) return;
+      if (!session && !$("adminPage").classList.contains("hidden")) showHome();
     });
 
-    if(news.length === 0) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 3;
-        td.textContent = "No published news.";
-        tr.appendChild(td);
-        list.appendChild(tr);
-    }
-}
-
-// EDIT NEWS
-function editNews(id) {
-
-    const item = news.find(n => n.id === id);
-    if(!item) return;
-
-    editId = id;
-
-    document.getElementById("newsTitle").value = item.title;
-    document.getElementById("newsCategory").value = item.category;
-    document.getElementById("newsDescription").value = item.description;
-
-    selectedImage = item.image.startsWith("data:image/")
-        ? item.image : "";
-
-    document.getElementById("imageURL").value =
-        item.image.startsWith("data:image/") ? "" : item.image;
-
-    document.getElementById("formTitle").textContent = "Update News";
-    document.getElementById("publishBtn").textContent = "Update News";
-
-    window.scrollTo({top:0,behavior:"smooth"});
-}
-
-// DELETE NEWS
-function deleteNews(id) {
-
-    if(confirm("Are you sure you want to delete this news?")) {
-
-        news = news.filter(n => n.id !== id);
-
-        localStorage.setItem("news", JSON.stringify(news));
-
-        renderAdmin();
-        renderNews();
-    }
-}
-
-// INITIAL PAGE
-if(sessionStorage.getItem("adminLoggedIn") === "true") {
-    showAdmin();
-} else {
-    showHome();
-}
-
-</script>
-
+    (async function init() {
+      const { data: { session } } = await db.auth.getSession();
+      if (session) await showAdmin();
+      else await showHome();
+    })();
+  </script>
 </body>
 </html>
