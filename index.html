@@ -49,6 +49,17 @@
     .read-button { align-self: flex-start; margin-top: 14px; }
     footer { background: #000; color: var(--gold); text-align: center; padding: 24px; margin-top: 50px; font-size: 14px; border-top: 2px solid var(--gold); }
     .hidden { display: none !important; }
+    .ads-section { margin: 0 0 28px; padding: 18px; border: 1px dashed var(--gold-soft); border-radius: 10px; background: linear-gradient(180deg, #11110a, #0d0d12); }
+    .article-ads { margin-top: 30px; }
+    .ads-heading { margin: 0 0 14px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+    .ad-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .ad-card { position: relative; background: var(--surface); border: 1px solid var(--gold-soft); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 14px #d4af3722; }
+    .ad-card img { width: 100%; height: 150px; object-fit: cover; background: var(--surface-2); }
+    .ad-badge { position: absolute; top: 10px; left: 10px; background: #000000cc; color: var(--gold-light); border: 1px solid var(--gold); border-radius: 4px; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; padding: 3px 8px; }
+    .ad-body { padding: 14px; display: flex; flex-direction: column; flex: 1; }
+    .ad-body h4 { margin: 0 0 6px; font-size: 16px; line-height: 1.4; color: var(--gold-light); }
+    .ad-body p { margin: 0; color: var(--text); opacity: .85; font-size: 13px; line-height: 1.5; }
+    .ad-body button { align-self: flex-start; margin-top: 12px; padding: 7px 12px; font-size: 13px; }
     .panel { background: var(--surface); border: 1px solid var(--line); padding: 24px; border-radius: 10px; margin-bottom: 22px; box-shadow: 0 4px 18px #00000088; }
     .panel h2 { margin-top: 0; }
     .login-box { max-width: 420px; margin: 65px auto; }
@@ -97,6 +108,7 @@
   <main>
     <section id="homePage" class="container">
       <h2 class="section-title" id="latest"><span id="sectionTitle">Latest News</span></h2>
+      <div id="homeAds" class="ads-section hidden"></div>
       <div id="homeMessage" class="notice hidden"></div>
       <div class="news-grid" id="newsGrid"></div>
     </section>
@@ -104,6 +116,7 @@
     <section id="articlePage" class="container hidden">
       <button class="secondary" id="backToNews">← Back to News</button>
       <article id="articleContent" style="margin-top:22px"></article>
+      <div id="articleAds" class="ads-section article-ads hidden"></div>
     </section>
 
     <section id="loginPage" class="container hidden">
@@ -149,6 +162,7 @@
             <option>Life style</option>
             <option>Others</option>
           </select>
+          <p class="muted">To publish an advertisement, choose <b>Advertisements</b>. Ads appear in the sponsored section on the home page and under every article.</p>
           <label for="newsImage">Upload news image (optional)</label>
           <input type="file" id="newsImage" accept="image/png,image/jpeg,image/webp">
           <p class="muted">Images are uploaded to your Supabase Storage bucket named <b>news-images</b>. Maximum file size: 5 MB.</p>
@@ -194,6 +208,50 @@
 
     function normalizeCategory(value) {
       return CATEGORIES.includes(value) ? value : "Others";
+    }
+
+    function renderAds(containerId, excludeId, limit = 3) {
+      const box = $(containerId);
+      box.replaceChildren();
+      const ads = news.filter(item => item.category === "Advertisements" && String(item.id) !== String(excludeId));
+      if (!ads.length) { box.classList.add("hidden"); return; }
+
+      const picked = ads.slice().sort(() => Math.random() - 0.5).slice(0, limit);
+
+      const heading = document.createElement("h3");
+      heading.className = "ads-heading";
+      heading.textContent = "Advertisements";
+
+      const grid = document.createElement("div");
+      grid.className = "ad-grid";
+
+      picked.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "ad-card";
+        card.appendChild(makeImage(item.image, item.title));
+
+        const badge = document.createElement("span");
+        badge.className = "ad-badge";
+        badge.textContent = "SPONSORED";
+
+        const body = document.createElement("div");
+        body.className = "ad-body";
+        const title = document.createElement("h4");
+        title.textContent = item.title;
+        const text = document.createElement("p");
+        const desc = item.description || "";
+        text.textContent = desc.length > 90 ? desc.slice(0, 90) + "…" : desc;
+        const button = document.createElement("button");
+        button.textContent = "Learn More";
+        button.addEventListener("click", () => readArticle(item.id));
+
+        body.append(title, text, button);
+        card.append(badge, body);
+        grid.appendChild(card);
+      });
+
+      box.append(heading, grid);
+      box.classList.remove("hidden");
     }
 
     function renderCatBar() {
@@ -272,8 +330,11 @@
 
       $("sectionTitle").textContent = currentCategory === "All" ? "Latest News" : currentCategory;
       const visible = currentCategory === "All"
-        ? news
+        ? news.filter(item => item.category !== "Advertisements")
         : news.filter(item => normalizeCategory(item.category) === currentCategory);
+
+      if (currentCategory === "Advertisements") $("homeAds").classList.add("hidden");
+      else renderAds("homeAds", null, 3);
 
       if (!visible.length) {
         const empty = document.createElement("p");
@@ -340,6 +401,7 @@
       body.textContent = item.description || "";
 
       area.append(title, meta, image, body);
+      renderAds("articleAds", item.id, 3);
     }
 
     async function showLogin() {
