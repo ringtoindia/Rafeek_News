@@ -7,57 +7,66 @@
   <title>Daily News | News Portal</title>
   <style>
     :root {
-      --ink: #172033;
-      --muted: #667085;
-      --red: #dc2626;
-      --navy: #111827;
-      --paper: #f4f6f9;
-      --line: #e5e7eb;
+      --bg: #0a0a0f;
+      --surface: #14141c;
+      --surface-2: #1b1b26;
+      --gold: #d4af37;
+      --gold-light: #f3d97b;
+      --gold-soft: #b8962e;
+      --text: #e8d9a8;
+      --muted: #a8956a;
+      --red: #b91c1c;
+      --line: #2b2b38;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--paper); color: #222; font-family: Arial, Helvetica, sans-serif; }
-    header { background: var(--navy); color: white; padding: 20px max(5%, calc((100% - 1200px)/2)); display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-    .logo { font-size: 27px; font-weight: 800; letter-spacing: .5px; }
-    .logo span { color: #ef4444; }
+    body { margin: 0; background: var(--bg); color: var(--gold); font-family: Georgia, "Times New Roman", serif; }
+    h1, h2, h3 { color: var(--gold-light); }
+    header { background: #000; color: var(--gold); padding: 20px max(5%, calc((100% - 1200px)/2)); display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 2px solid var(--gold); }
+    .logo { font-size: 27px; font-weight: 800; letter-spacing: 2px; color: var(--gold-light); }
+    .logo span { color: var(--gold); text-shadow: 0 0 12px #d4af3766; }
     nav { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
-    nav a { color: white; text-decoration: none; font-size: 14px; }
-    nav a:hover { color: #fca5a5; }
-    .breaking { background: var(--red); color: white; padding: 11px max(5%, calc((100% - 1200px)/2)); font-size: 13px; font-weight: 700; }
+    nav a { color: var(--gold); text-decoration: none; font-size: 14px; letter-spacing: .5px; }
+    nav a:hover { color: var(--gold-light); }
+    .breaking { background: linear-gradient(90deg, #3b0a0a, #7f1d1d, #3b0a0a); color: var(--gold-light); padding: 11px max(5%, calc((100% - 1200px)/2)); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--gold-soft); }
     .container { width: min(90%, 1200px); margin: 30px auto; min-height: 48vh; }
-    .section-title { margin: 0 0 20px; border-left: 5px solid var(--red); padding-left: 12px; font-size: 25px; }
+    .section-title { margin: 0 0 20px; border-left: 5px solid var(--gold); padding-left: 12px; font-size: 25px; }
     .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
-    .news-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 14px #10182812; display: flex; flex-direction: column; }
-    .news-card img { width: 100%; height: 195px; object-fit: cover; background: #e5e7eb; }
+    .news-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 18px #00000088; display: flex; flex-direction: column; transition: transform .2s, border-color .2s; }
+    .news-card:hover { transform: translateY(-3px); border-color: var(--gold-soft); }
+    .news-card img { width: 100%; height: 195px; object-fit: cover; background: var(--surface-2); }
     .news-content { padding: 18px; display: flex; flex-direction: column; flex: 1; }
-    .category { color: var(--red); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
+    .category { color: var(--gold); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
     .news-content h3 { margin: 9px 0; line-height: 1.4; font-size: 19px; }
-    .news-content p { color: var(--muted); line-height: 1.55; margin: 0; }
-    .date { color: #98a2b3; font-size: 12px; margin-top: 13px; }
-    button { border: 0; border-radius: 6px; cursor: pointer; background: var(--red); color: white; padding: 10px 16px; font-weight: 700; }
-    button:hover { filter: brightness(.94); }
+    .news-content p { color: var(--text); opacity: .85; line-height: 1.55; margin: 0; }
+    .date { color: var(--muted); font-size: 12px; margin-top: 13px; }
+    button { border: 1px solid var(--gold); border-radius: 6px; cursor: pointer; background: linear-gradient(180deg, var(--gold-light), var(--gold)); color: #1a1405; padding: 10px 16px; font-weight: 700; font-family: inherit; }
+    button:hover { filter: brightness(1.08); }
     button:disabled { opacity: .55; cursor: wait; }
     .read-button { align-self: flex-start; margin-top: 14px; }
-    footer { background: var(--navy); color: white; text-align: center; padding: 24px; margin-top: 50px; font-size: 14px; }
+    footer { background: #000; color: var(--gold); text-align: center; padding: 24px; margin-top: 50px; font-size: 14px; border-top: 2px solid var(--gold); }
     .hidden { display: none !important; }
-    .panel { background: white; padding: 24px; border-radius: 10px; margin-bottom: 22px; box-shadow: 0 3px 14px #1018280c; }
+    .panel { background: var(--surface); border: 1px solid var(--line); padding: 24px; border-radius: 10px; margin-bottom: 22px; box-shadow: 0 4px 18px #00000088; }
     .panel h2 { margin-top: 0; }
     .login-box { max-width: 420px; margin: 65px auto; }
-    input, textarea, select { width: 100%; padding: 12px; margin: 7px 0 16px; border: 1px solid #d0d5dd; border-radius: 6px; font: inherit; background: white; }
+    input, textarea, select { width: 100%; padding: 12px; margin: 7px 0 16px; border: 1px solid var(--gold-soft); border-radius: 6px; font: inherit; background: #0d0d14; color: var(--gold-light); }
+    input::placeholder, textarea::placeholder { color: #7a6b43; }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
+    select option { background: #0d0d14; color: var(--gold-light); }
     textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
-    label { font-size: 14px; font-weight: 700; }
-    .secondary { background: #475467; }
-    .edit-btn { background: #2563eb; margin-right: 6px; }
-    .delete-btn { background: #991b1b; }
+    label { font-size: 14px; font-weight: 700; color: var(--gold-light); }
+    .secondary { background: #2a2a38; color: var(--gold); border-color: var(--gold-soft); }
+    .edit-btn { background: #1e3a5f; color: var(--gold-light); border-color: #3b6aa0; margin-right: 6px; }
+    .delete-btn { background: #7f1d1d; color: var(--gold-light); border-color: #b91c1c; }
     .admin-table-wrap { overflow-x: auto; }
     .admin-table { width: 100%; border-collapse: collapse; min-width: 550px; }
-    .admin-table th, .admin-table td { padding: 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
-    .admin-table th { background: #f9fafb; font-size: 13px; }
-    .article-image { width: 100%; max-height: 470px; object-fit: cover; border-radius: 9px; margin: 20px 0; background: #e5e7eb; }
-    .article-body { background: white; padding: 26px; border-radius: 9px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .admin-table th, .admin-table td { padding: 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; color: var(--text); }
+    .admin-table th { background: var(--surface-2); font-size: 13px; color: var(--gold); }
+    .article-image { width: 100%; max-height: 470px; object-fit: cover; border-radius: 9px; margin: 20px 0; background: var(--surface-2); border: 1px solid var(--line); }
+    .article-body { background: var(--surface); border: 1px solid var(--line); color: var(--text); padding: 26px; border-radius: 9px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
     .article-meta { color: var(--muted); margin-top: 8px; font-size: 14px; }
-    .notice { padding: 12px 14px; border-radius: 7px; margin: 12px 0; background: #eff6ff; color: #1d4ed8; font-size: 14px; }
-    .error { background: #fef2f2; color: #b91c1c; }
-    .success { background: #ecfdf3; color: #027a48; }
+    .notice { padding: 12px 14px; border-radius: 7px; margin: 12px 0; background: #1a2336; color: #9ec1ff; font-size: 14px; border: 1px solid #2c3d5f; }
+    .error { background: #2a1214; color: #ff9b9b; border-color: #6b2226; }
+    .success { background: #10261a; color: #86e3a8; border-color: #1f5a37; }
     .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
     .muted { color: var(--muted); font-size: 13px; }
     @media (max-width: 620px) {
@@ -124,8 +133,16 @@
           <input type="text" id="newsTitle" maxlength="180" required>
           <label for="newsCategory">Category</label>
           <select id="newsCategory">
-            <option>World</option><option>Local</option><option>Technology</option>
-            <option>Business</option><option>Sports</option><option>Entertainment</option>
+            <option>Advertisements</option>
+            <option>Information</option>
+            <option>Crime</option>
+            <option>Local</option>
+            <option>Education</option>
+            <option>Science and Technology</option>
+            <option>Sports</option>
+            <option>Weather</option>
+            <option>Life style</option>
+            <option>Others</option>
           </select>
           <label for="newsImage">Upload news image (optional)</label>
           <input type="file" id="newsImage" accept="image/png,image/jpeg,image/webp">
@@ -193,11 +210,11 @@
 
     function makeImage(src, alt, className) {
       const img = document.createElement("img");
-      img.src = src || "https://placehold.co/800x450?text=Daily+News";
+      img.src = src || "https://placehold.co/800x450/14141c/d4af37?text=Daily+News";
       img.alt = alt || "News image";
       img.className = className || "";
       img.loading = "lazy";
-      img.onerror = () => { img.onerror = null; img.src = "https://placehold.co/800x450?text=Daily+News"; };
+      img.onerror = () => { img.onerror = null; img.src = "https://placehold.co/800x450/14141c/d4af37?text=Daily+News"; };
       return img;
     }
 
@@ -468,7 +485,10 @@
       editId = item.id;
       currentImageUrl = item.image || "";
       $("newsTitle").value = item.title || "";
-      $("newsCategory").value = item.category || "World";
+      // Older articles may use a category that is no longer in the list; fall back to "Others".
+      const select = $("newsCategory");
+      select.value = item.category || "Others";
+      if (select.value !== (item.category || "Others")) select.value = "Others";
       $("newsDescription").value = item.description || "";
       $("imageURL").value = item.image || "";
       $("newsImage").value = "";
