@@ -31,7 +31,24 @@
     .catbar a { color: var(--gold); text-decoration: none; font-size: 13px; letter-spacing: .6px; padding: 14px 14px; border-bottom: 3px solid transparent; flex: 0 0 auto; }
     .catbar a:hover { color: var(--gold-light); background: #14141c; }
     .catbar a.active { color: var(--gold-light); border-bottom-color: var(--gold); font-weight: 700; }
-    .breaking { background: linear-gradient(90deg, #3b0a0a, #7f1d1d, #3b0a0a); color: var(--gold-light); padding: 11px max(5%, calc((100% - 1200px)/2)); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--gold-soft); }
+    .breaking-label { flex: 0 0 auto; background: #000; color: var(--gold-light); border: 1px solid var(--gold); border-radius: 4px; padding: 4px 10px; font-size: 12px; letter-spacing: 1px; }
+    .ticker-wrap { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
+    .ticker-track { display: inline-block; padding-left: 100%; animation: ticker var(--dur, 30s) linear infinite; font-weight: 400; }
+    .ticker-wrap:hover .ticker-track { animation-play-state: paused; }
+    .ticker-item { margin-right: 36px; }
+    .ticker-item::before { content: "\25C6"; color: var(--gold); margin-right: 14px; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+    @media (prefers-reduced-motion: reduce) { .ticker-track { animation-duration: 120s; } }
+    .popup-overlay { position: fixed; inset: 0; background: #000000c0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .popup-box { position: relative; background: var(--surface); border: 2px solid var(--gold); border-radius: 12px; width: min(94%, 520px); max-height: 92vh; overflow-y: auto; padding: 18px; box-shadow: 0 0 40px #d4af3744; text-align: center; }
+    .popup-close { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; padding: 0; border-radius: 50%; font-size: 20px; line-height: 1; background: #000; color: var(--gold-light); z-index: 2; }
+    .popup-tag { display: inline-block; background: var(--gold); color: #1a1405; font-size: 11px; font-weight: 800; letter-spacing: 2px; padding: 4px 12px; border-radius: 4px; margin-bottom: 12px; }
+    .popup-image { width: 100%; max-height: 60vh; object-fit: contain; border-radius: 8px; background: var(--surface-2); display: block; }
+    #popupMedia a { display: block; cursor: pointer; }
+    .popup-box h3 { margin: 14px 0 4px; font-size: 20px; }
+    .popup-cta { display: inline-block; margin-top: 10px; background: linear-gradient(180deg, var(--gold-light), var(--gold)); color: #1a1405; text-decoration: none; font-weight: 700; padding: 10px 18px; border-radius: 6px; }
+    input[type="checkbox"] { width: auto; margin: 0 8px 0 0; vertical-align: middle; }
+    .breaking { background: linear-gradient(90deg, #3b0a0a, #7f1d1d, #3b0a0a); color: var(--gold-light); padding: 11px max(5%, calc((100% - 1200px)/2)); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--gold-soft); display: flex; align-items: center; gap: 14px; }
     .container { width: min(90%, 1200px); margin: 30px auto; min-height: 48vh; }
     .section-title { margin: 0 0 20px; border-left: 5px solid var(--gold); padding-left: 12px; font-size: 25px; }
     .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
@@ -103,7 +120,23 @@
     </nav>
   </header>
   <div class="catbar" id="catBar" aria-label="News categories"></div>
-  <div class="breaking">BREAKING NEWS <span style="font-weight:400">| Latest Updates and Headlines</span></div>
+  <div class="breaking">
+    <span class="breaking-label">BREAKING NEWS</span>
+    <div class="ticker-wrap" aria-live="off">
+      <div class="ticker-track" id="tickerTrack"><span class="ticker-item">Latest Updates and Headlines</span></div>
+    </div>
+  </div>
+
+  <!-- Event pop-up -->
+  <div id="eventPopup" class="popup-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+    <div class="popup-box">
+      <button type="button" class="popup-close" id="popupClose" aria-label="Close pop-up">&times;</button>
+      <div class="popup-tag">NEW EVENT</div>
+      <div id="popupMedia"></div>
+      <h3 id="popupTitle"></h3>
+      <a id="popupCta" class="popup-cta hidden" target="_blank" rel="noopener noreferrer">View Details</a>
+    </div>
+  </div>
 
   <main>
     <section id="homePage" class="container">
@@ -182,6 +215,51 @@
           <table class="admin-table">
             <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody id="adminNewsList"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 id="tickerFormTitle">Scrolling News Ticker</h2>
+        <p class="muted">Short headlines that scroll in the Breaking News bar at the top of the site.</p>
+        <form id="tickerForm">
+          <label for="tickerText">Ticker text</label>
+          <input type="text" id="tickerText" maxlength="200" required>
+          <button type="submit" id="tickerSaveButton">Add to Ticker</button>
+          <button type="button" class="secondary" id="tickerClearButton">Clear</button>
+          <div id="tickerMessage" class="notice hidden" role="status"></div>
+        </form>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Ticker text</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="tickerList"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 id="popupFormTitle">Event Pop-up</h2>
+        <p class="muted">The newest <b>active</b> pop-up appears when someone opens the website. Add a link to make the image clickable.</p>
+        <form id="popupForm">
+          <label for="popupTitleInput">Event title</label>
+          <input type="text" id="popupTitleInput" maxlength="150" required>
+          <label for="popupImageFile">Upload event image</label>
+          <input type="file" id="popupImageFile" accept="image/png,image/jpeg,image/webp">
+          <label for="popupImageURL">Or use an image URL</label>
+          <input type="url" id="popupImageURL" placeholder="https://example.com/event.jpg">
+          <label for="popupLinkInput">Link (opens when the image is clicked)</label>
+          <input type="url" id="popupLinkInput" placeholder="https://example.com/event-page">
+          <label><input type="checkbox" id="popupActive" checked> Active (show on website)</label>
+          <div style="margin-top:14px">
+            <button type="submit" id="popupSaveButton">Publish Pop-up</button>
+            <button type="button" class="secondary" id="popupClearButton">Clear</button>
+          </div>
+          <div id="popupMessage" class="notice hidden" role="status"></div>
+        </form>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="popupList"></tbody>
           </table>
         </div>
       </div>
@@ -419,6 +497,10 @@
       $("adminEmail").textContent = session.user.email || "";
       await loadNews();
       renderAdmin();
+      await loadTicker();
+      renderTickerAdmin();
+      await loadPopupsAdmin();
+      renderPopupAdmin();
     }
 
     async function handleLogin(event) {
@@ -449,6 +531,8 @@
         return;
       }
       resetForm();
+      resetTickerForm();
+      resetPopupForm();
       await showHome();
     }
 
@@ -605,6 +689,325 @@
       renderAdmin();
     }
 
+    // ---------- Helpers ----------
+    function safeUrl(value) {
+      try {
+        const u = new URL(value);
+        return (u.protocol === "http:" || u.protocol === "https:") ? u.href : "";
+      } catch (e) { return ""; }
+    }
+
+    // ---------- Scrolling ticker ----------
+    let tickerItems = [];
+    let tickerError = "";
+    let editTickerId = null;
+
+    async function loadTicker() {
+      const { data, error } = await db.from("ticker_items")
+        .select("id,text,created_at")
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.warn("Ticker unavailable:", error.message);
+        tickerItems = [];
+        tickerError = error.message;
+      } else {
+        tickerItems = data || [];
+        tickerError = "";
+      }
+      renderTicker();
+    }
+
+    function renderTicker() {
+      const track = $("tickerTrack");
+      track.replaceChildren();
+      const texts = tickerItems.length ? tickerItems.map(i => i.text) : ["Latest Updates and Headlines"];
+      texts.forEach(text => {
+        const span = document.createElement("span");
+        span.className = "ticker-item";
+        span.textContent = text;
+        track.appendChild(span);
+      });
+      const chars = texts.join("").length;
+      track.style.setProperty("--dur", Math.max(20, Math.round(chars * 0.22)) + "s");
+    }
+
+    function renderTickerAdmin() {
+      const tbody = $("tickerList");
+      tbody.replaceChildren();
+      if (tickerError) {
+        showNotice("tickerMessage", "Ticker table not available: " + tickerError + ". Run the ticker_items SQL setup in Supabase.", "error");
+      }
+      if (!tickerItems.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 3;
+        cell.textContent = "No ticker items yet.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+      }
+      tickerItems.forEach(item => {
+        const row = document.createElement("tr");
+        const text = document.createElement("td");
+        text.textContent = item.text;
+        const date = document.createElement("td");
+        date.textContent = formatDate(item.created_at);
+        const actions = document.createElement("td");
+
+        const edit = document.createElement("button");
+        edit.className = "edit-btn";
+        edit.textContent = "Edit";
+        edit.addEventListener("click", () => editTicker(item.id));
+
+        const del = document.createElement("button");
+        del.className = "delete-btn";
+        del.textContent = "Delete";
+        del.addEventListener("click", () => deleteTicker(item.id));
+
+        actions.append(edit, del);
+        row.append(text, date, actions);
+        tbody.appendChild(row);
+      });
+    }
+
+    function resetTickerForm(clearMessage = true) {
+      $("tickerForm").reset();
+      editTickerId = null;
+      $("tickerFormTitle").textContent = "Scrolling News Ticker";
+      $("tickerSaveButton").textContent = "Add to Ticker";
+      if (clearMessage) hideNotice("tickerMessage");
+    }
+
+    async function saveTicker(event) {
+      event.preventDefault();
+      hideNotice("tickerMessage");
+      const text = $("tickerText").value.trim();
+      if (!text) return;
+
+      $("tickerSaveButton").disabled = true;
+      const result = editTickerId === null
+        ? await db.from("ticker_items").insert({ text })
+        : await db.from("ticker_items").update({ text }).eq("id", editTickerId);
+      $("tickerSaveButton").disabled = false;
+
+      if (result.error) {
+        showNotice("tickerMessage", "Could not save ticker item: " + result.error.message, "error");
+        return;
+      }
+      const wasEdit = editTickerId !== null;
+      resetTickerForm(false);
+      await loadTicker();
+      renderTickerAdmin();
+      showNotice("tickerMessage", wasEdit ? "Ticker item updated." : "Ticker item added.", "success");
+    }
+
+    function editTicker(id) {
+      const item = tickerItems.find(row => String(row.id) === String(id));
+      if (!item) return;
+      editTickerId = item.id;
+      $("tickerText").value = item.text || "";
+      $("tickerFormTitle").textContent = "Edit Ticker Item";
+      $("tickerSaveButton").textContent = "Update Ticker Item";
+      hideNotice("tickerMessage");
+      $("tickerText").focus();
+    }
+
+    async function deleteTicker(id) {
+      if (!confirm("Delete this ticker item?")) return;
+      const { error } = await db.from("ticker_items").delete().eq("id", id);
+      if (error) { alert("Could not delete: " + error.message); return; }
+      if (editTickerId !== null && String(editTickerId) === String(id)) resetTickerForm();
+      await loadTicker();
+      renderTickerAdmin();
+    }
+
+    // ---------- Event pop-up ----------
+    let popups = [];
+    let popupError = "";
+    let editPopupId = null;
+    let currentPopupImage = "";
+
+    async function showEventPopup() {
+      const { data, error } = await db.from("event_popups")
+        .select("id,title,image,link")
+        .eq("active", true)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (error || !data || !data.length) return;
+
+      const ev = data[0];
+      if (!ev.image && !ev.title) return;
+      const link = safeUrl(ev.link || "");
+
+      $("popupTitle").textContent = ev.title || "";
+      const media = $("popupMedia");
+      media.replaceChildren();
+      if (ev.image) {
+        const img = makeImage(ev.image, ev.title, "popup-image");
+        img.loading = "eager";
+        if (link) {
+          const a = document.createElement("a");
+          a.href = link;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.title = "Open link";
+          a.appendChild(img);
+          media.appendChild(a);
+        } else {
+          media.appendChild(img);
+        }
+      }
+      const cta = $("popupCta");
+      if (link) { cta.href = link; cta.classList.remove("hidden"); }
+      else { cta.classList.add("hidden"); cta.removeAttribute("href"); }
+      $("eventPopup").classList.remove("hidden");
+    }
+
+    function closeEventPopup() { $("eventPopup").classList.add("hidden"); }
+
+    async function loadPopupsAdmin() {
+      const { data, error } = await db.from("event_popups")
+        .select("id,title,image,link,active,created_at")
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.warn("Pop-ups unavailable:", error.message);
+        popups = [];
+        popupError = error.message;
+      } else {
+        popups = data || [];
+        popupError = "";
+      }
+    }
+
+    function renderPopupAdmin() {
+      const tbody = $("popupList");
+      tbody.replaceChildren();
+      if (popupError) {
+        showNotice("popupMessage", "Pop-up table not available: " + popupError + ". Run the event_popups SQL setup in Supabase.", "error");
+      }
+      if (!popups.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.textContent = "No pop-ups yet.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+      }
+      popups.forEach(item => {
+        const row = document.createElement("tr");
+        const title = document.createElement("td");
+        title.textContent = item.title;
+        const status = document.createElement("td");
+        status.textContent = item.active ? "Active" : "Hidden";
+        const date = document.createElement("td");
+        date.textContent = formatDate(item.created_at);
+        const actions = document.createElement("td");
+
+        const edit = document.createElement("button");
+        edit.className = "edit-btn";
+        edit.textContent = "Edit";
+        edit.addEventListener("click", () => editPopup(item.id));
+
+        const del = document.createElement("button");
+        del.className = "delete-btn";
+        del.textContent = "Delete";
+        del.addEventListener("click", () => deletePopup(item.id));
+
+        actions.append(edit, del);
+        row.append(title, status, date, actions);
+        tbody.appendChild(row);
+      });
+    }
+
+    function resetPopupForm(clearMessage = true) {
+      $("popupForm").reset();
+      $("popupActive").checked = true;
+      editPopupId = null;
+      currentPopupImage = "";
+      $("popupFormTitle").textContent = "Event Pop-up";
+      $("popupSaveButton").textContent = "Publish Pop-up";
+      if (clearMessage) hideNotice("popupMessage");
+    }
+
+    async function savePopup(event) {
+      event.preventDefault();
+      hideNotice("popupMessage");
+
+      const title = $("popupTitleInput").value.trim();
+      const file = $("popupImageFile").files[0];
+      const imageURL = $("popupImageURL").value.trim();
+      const linkRaw = $("popupLinkInput").value.trim();
+      const active = $("popupActive").checked;
+
+      if (!title) { showNotice("popupMessage", "Please enter an event title.", "error"); return; }
+      const link = linkRaw ? safeUrl(linkRaw) : "";
+      if (linkRaw && !link) { showNotice("popupMessage", "The link must start with http:// or https://", "error"); return; }
+
+      $("popupSaveButton").disabled = true;
+      const wasEdit = editPopupId !== null;
+      try {
+        let image = currentPopupImage;
+        if (file) {
+          const previous = currentImageUrl;
+          currentImageUrl = "";
+          try { image = await uploadImage(file); } finally { currentImageUrl = previous; }
+        } else if (imageURL) {
+          image = imageURL;
+        }
+        if (!image) throw new Error("Please add an event image (upload or URL).");
+
+        const payload = { title, image, link: link || null, active };
+        const result = wasEdit
+          ? await db.from("event_popups").update(payload).eq("id", editPopupId)
+          : await db.from("event_popups").insert(payload);
+        if (result.error) throw result.error;
+
+        resetPopupForm(false);
+        await loadPopupsAdmin();
+        renderPopupAdmin();
+        showNotice("popupMessage", wasEdit ? "Pop-up updated." : "Pop-up published.", "success");
+      } catch (error) {
+        console.error(error);
+        showNotice("popupMessage", "Could not save pop-up: " + (error.message || "Unknown error"), "error");
+      } finally {
+        $("popupSaveButton").disabled = false;
+      }
+    }
+
+    function editPopup(id) {
+      const item = popups.find(row => String(row.id) === String(id));
+      if (!item) return;
+      editPopupId = item.id;
+      currentPopupImage = item.image || "";
+      $("popupTitleInput").value = item.title || "";
+      $("popupImageURL").value = item.image || "";
+      $("popupImageFile").value = "";
+      $("popupLinkInput").value = item.link || "";
+      $("popupActive").checked = !!item.active;
+      $("popupFormTitle").textContent = "Edit Event Pop-up";
+      $("popupSaveButton").textContent = "Update Pop-up";
+      hideNotice("popupMessage");
+      $("popupTitleInput").focus();
+    }
+
+    async function deletePopup(id) {
+      if (!confirm("Delete this pop-up?")) return;
+      const { error } = await db.from("event_popups").delete().eq("id", id);
+      if (error) { alert("Could not delete: " + error.message); return; }
+      if (editPopupId !== null && String(editPopupId) === String(id)) resetPopupForm();
+      await loadPopupsAdmin();
+      renderPopupAdmin();
+    }
+
+    $("tickerForm").addEventListener("submit", saveTicker);
+    $("tickerClearButton").addEventListener("click", () => resetTickerForm());
+    $("popupForm").addEventListener("submit", savePopup);
+    $("popupClearButton").addEventListener("click", () => resetPopupForm());
+    $("popupClose").addEventListener("click", closeEventPopup);
+    $("eventPopup").addEventListener("click", event => { if (event.target === $("eventPopup")) closeEventPopup(); });
+    document.addEventListener("keydown", event => { if (event.key === "Escape") closeEventPopup(); });
+
     $("homeLink").addEventListener("click", event => { event.preventDefault(); showHome("All"); });
     $("latestLink").addEventListener("click", event => { event.preventDefault(); showHome("All"); });
     $("adminLink").addEventListener("click", event => { event.preventDefault(); showLogin(); });
@@ -623,8 +1026,12 @@
 
     (async function init() {
       const { data: { session } } = await db.auth.getSession();
+      loadTicker();
       if (session) await showAdmin();
-      else await showHome();
+      else {
+        await showHome();
+        showEventPopup();
+      }
     })();
   </script>
 </body>
