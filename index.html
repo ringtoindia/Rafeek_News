@@ -95,6 +95,11 @@
     .admin-table th { background: var(--surface-2); font-size: 13px; color: var(--gold); }
     .article-image { width: 100%; max-height: 470px; object-fit: cover; border-radius: 9px; margin: 20px 0; background: var(--surface-2); border: 1px solid var(--line); }
     .article-body { background: var(--surface); border: 1px solid var(--line); color: var(--text); padding: 26px; border-radius: 9px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .share-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; padding: 16px; background: var(--surface); border: 1px solid var(--gold-soft); border-radius: 9px; }
+    .share-label { color: var(--gold-light); font-weight: 700; margin-right: 6px; }
+    .share-btn { display: inline-block; font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; padding: 9px 14px; border-radius: 6px; border: 1px solid var(--gold); background: #0d0d14; color: var(--gold-light); }
+    .share-btn:hover { background: var(--gold); color: #1a1405; }
+    .share-status { color: #86e3a8; font-size: 13px; }
     .article-meta { color: var(--muted); margin-top: 8px; font-size: 14px; }
     .notice { padding: 12px 14px; border-radius: 7px; margin: 12px 0; background: #1a2336; color: #9ec1ff; font-size: 14px; border: 1px solid #2c3d5f; }
     .error { background: #2a1214; color: #ff9b9b; border-color: #6b2226; }
@@ -395,7 +400,8 @@
       return true;
     }
 
-    async function showHome(category = "All") {
+    async function showHome(category = "All", updateUrl = true) {
+      if (updateUrl && location.hash.startsWith("#news-")) history.pushState(null, "", location.href.split("#")[0]);
       currentCategory = category;
       renderCatBar();
       showOnly("homePage");
@@ -458,11 +464,70 @@
       });
     }
 
-    function readArticle(id) {
+    function buildShareBar(item) {
+      const url = location.href.split("#")[0] + "#news-" + item.id;
+      const title = item.title || "Daily News";
+      const bar = document.createElement("div");
+      bar.className = "share-bar";
+
+      const label = document.createElement("span");
+      label.className = "share-label";
+      label.textContent = "Share this news:";
+      bar.appendChild(label);
+
+      const status = document.createElement("span");
+      status.className = "share-status";
+
+      if (navigator.share) {
+        const nativeBtn = document.createElement("button");
+        nativeBtn.type = "button";
+        nativeBtn.className = "share-btn";
+        nativeBtn.textContent = "Share";
+        nativeBtn.addEventListener("click", async () => {
+          try { await navigator.share({ title, text: title, url }); } catch (e) { /* cancelled */ }
+        });
+        bar.appendChild(nativeBtn);
+      }
+
+      const links = [
+        ["WhatsApp", "https://wa.me/?text=" + encodeURIComponent(title + "\n" + url)],
+        ["Facebook", "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)],
+        ["X", "https://twitter.com/intent/tweet?text=" + encodeURIComponent(title) + "&url=" + encodeURIComponent(url)],
+        ["Telegram", "https://t.me/share/url?url=" + encodeURIComponent(url) + "&text=" + encodeURIComponent(title)]
+      ];
+      links.forEach(([name, href]) => {
+        const a = document.createElement("a");
+        a.className = "share-btn";
+        a.href = href;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = name;
+        bar.appendChild(a);
+      });
+
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.className = "share-btn";
+      copy.textContent = "Copy Link";
+      copy.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          status.textContent = "Link copied!";
+          setTimeout(() => { status.textContent = ""; }, 2500);
+        } catch (e) {
+          window.prompt("Copy this link:", url);
+        }
+      });
+      bar.append(copy, status);
+      return bar;
+    }
+
+    function readArticle(id, fromUrl = false) {
       const item = news.find(row => String(row.id) === String(id));
       if (!item) return;
 
       showOnly("articlePage");
+      if (!fromUrl) history.pushState(null, "", location.href.split("#")[0] + "#news-" + item.id);
       const area = $("articleContent");
       area.replaceChildren();
 
@@ -478,7 +543,7 @@
       body.className = "article-body";
       body.textContent = item.description || "";
 
-      area.append(title, meta, image, body);
+      area.append(title, meta, image, body, buildShareBar(item));
       renderAds("articleAds", item.id, 3);
     }
 
@@ -1000,6 +1065,13 @@
       renderPopupAdmin();
     }
 
+    function routeFromUrl() {
+      const m = location.hash.match(/^#news-(.+)$/);
+      if (m) readArticle(decodeURIComponent(m[1]), true);
+      else showHome(currentCategory, false);
+    }
+    window.addEventListener("popstate", routeFromUrl);
+
     $("tickerForm").addEventListener("submit", saveTicker);
     $("tickerClearButton").addEventListener("click", () => resetTickerForm());
     $("popupForm").addEventListener("submit", savePopup);
@@ -1029,7 +1101,8 @@
       loadTicker();
       if (session) await showAdmin();
       else {
-        await showHome();
+        await showHome("All", false);
+        if (/^#news-/.test(location.hash)) routeFromUrl();
         showEventPopup();
       }
     })();
